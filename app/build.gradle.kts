@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.androidx.navigation.safeargs)
     id("org.jetbrains.kotlin.plugin.parcelize")
     alias(libs.plugins.google.devtools.ksp)
+    id ("jacoco")
 }
 
 android {
@@ -175,6 +176,7 @@ dependencies {
     implementation(libs.tankery.circularSeekBar)
 
     implementation(libs.androidx.exoplayer)
+    testImplementation("junit:junit:4.13.2")
 }
 
 fun getProperties(fileName: String): Properties? {
@@ -190,3 +192,43 @@ fun getProperties(fileName: String): Properties? {
 
 fun getProperty(properties: Properties?, name: String): String =
     properties?.getProperty(name) ?: "$name missing"
+
+tasks.withType<Test> {
+    extensions.configure(JacocoTaskExtension::class) {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
+}
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+
+    dependsOn("testNormalDebugUnitTest")
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val fileFilter = listOf("**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*", "android/**/*.*")
+
+    val buildPath = layout.buildDirectory.get().asFile.path
+
+    val debugTree = fileTree("$buildPath/tmp/kotlin-classes/normalDebug") {
+        exclude(fileFilter)
+    }
+    val mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree))
+
+    executionData.setFrom(fileTree(buildPath) {
+        include(
+            "jacoco/testNormalDebugUnitTest.exec",
+            "outputs/unit_test_code_coverage/normalDebugUnitTest/testNormalDebugUnitTest.exec"
+        )
+    })
+}
+
+

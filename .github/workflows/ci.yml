@@ -1,10 +1,10 @@
-name: Android CI
+name: ASS CI
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "dev", "master" ]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "dev", "master" ]
 
 jobs:
   build:
@@ -28,11 +28,14 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew assembleDebug
 
+      - name: List all Gradle tasks (Debug)
+        run: ./gradlew :app:tasks --all
+
       - name: Run Tests and Generate Jacoco Report
-        run: ./gradlew jacocoTestReport
+        run: ./gradlew :app:jacocoTestReport
 
       - name: Upload Jacoco Report
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-test-report
-          path: app/build/reports/jacoco/jacocoTestReport/
+          path: "**/build/reports/jacoco/jacocoTestReport/"
