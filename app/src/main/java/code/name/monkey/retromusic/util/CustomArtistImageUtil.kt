@@ -108,6 +108,22 @@ class CustomArtistImageUtil private constructor(context: Context) {
         }
     }
 
+    suspend fun resetAllCustomArtistImages(): Int {
+        return withContext(IO) {
+            val context = App.getContext()
+            val dir = File(context.filesDir, FOLDER_NAME)
+            val files = dir.listFiles().orEmpty()
+            val deletedCount = files.count { it.delete() }
+
+            mPreferences.edit { clear() }
+            context.contentResolver.notifyChange(
+                MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
+                null
+            )
+            deletedCount
+        }
+    }
+
     // shared prefs saves us many IO operations
     fun hasCustomArtistImage(artist: Artist): Boolean {
         return mPreferences.getBoolean(getFileName(artist), false)

@@ -123,6 +123,7 @@ const val NEXT_SLEEP_TIMER_ELAPSED_REALTIME = "next_sleep_timer_elapsed_real_tim
 const val IGNORE_MEDIA_STORE_ARTWORK = "ignore_media_store_artwork"
 const val LAST_CHANGELOG_VERSION = "last_changelog_version"
 const val AUTO_DOWNLOAD_IMAGES_POLICY = "auto_download_images_policy"
+const val RESET_CUSTOM_ARTIST_IMAGES = "reset_custom_artist_images"
 const val START_DIRECTORY = "start_directory"
 const val LAST_DIRECTORY = "last_directory"
 const val SAVE_LAST_DIRECTORY = "save_last_directory"

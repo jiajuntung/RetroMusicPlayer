@@ -16,9 +16,15 @@ package code.name.monkey.retromusic.fragments.settings
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import code.name.monkey.retromusic.AUTO_DOWNLOAD_IMAGES_POLICY
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.RESET_CUSTOM_ARTIST_IMAGES
+import code.name.monkey.retromusic.extensions.showToast
+import code.name.monkey.retromusic.util.CustomArtistImageUtil
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.launch
 
 /**
  * @author Hemanth S (h4h13).
@@ -30,6 +36,29 @@ class ImageSettingFragment : AbsSettingsFragment() {
         setSummary(autoDownloadImagesPolicy)
         autoDownloadImagesPolicy.setOnPreferenceChangeListener { _, o ->
             setSummary(autoDownloadImagesPolicy, o)
+            true
+        }
+
+        val resetCustomArtistImages: Preference? = findPreference(RESET_CUSTOM_ARTIST_IMAGES)
+        resetCustomArtistImages?.setOnPreferenceClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.pref_title_reset_custom_artist_images)
+                .setMessage(R.string.pref_message_reset_custom_artist_images)
+                .setPositiveButton(R.string.reset_action) { _, _ ->
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        val deletedCount =
+                            CustomArtistImageUtil.getInstance(requireContext())
+                                .resetAllCustomArtistImages()
+                        showToast(
+                            getString(
+                                R.string.message_reset_custom_artist_images,
+                                deletedCount
+                            )
+                        )
+                    }
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
             true
         }
     }
